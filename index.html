@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>Note</title>
@@ -10,5 +10,310 @@
     </header>
     <h2>Note</h2>
     <p>Note is a simple note-taking application that allows you to create, edit, and delete notes. It is designed to be easy to use and lightweight.</p>
+</body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>sincerePad.</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>sincerePad.</h1>
+    </header>
+
+    <div class="paper">
+        <input type="text" id="note-title" placeholder="Judul..." maxlength="50">
+        <textarea id="note-content" placeholder="Tulis catatan ikhlasmu di sini..."></textarea>
+        <div class="note-footer">
+            <span>sincerePad</span>
+            <span class="date" id="current-date"></span>
+        </div>
+    </div>
+    
+    <div class="quote">
+        <p>"Menuangkan catatan dengan ikhlas"</p>
+    </div>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>sincerePad.</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>sincerePad.</h1>
+    </header>
+
+    <div class="container">
+        <!-- History panel menggunakan checkbox untuk toggle -->
+        <input type="checkbox" id="toggle-history" class="history-toggle">
+        <label for="toggle-history" class="toggle-btn">
+            <i class="fas fa-history"></i>
+            <span class="tooltip">Riwayat Catatan</span>
+        </label>
+
+        <!-- Panel history -->
+        <div class="history-panel">
+            <div class="history-header">
+                <h3>Riwayat Catatan</h3>
+                <label for="toggle-history" class="close-btn"><i class="fas fa-times"></i></label>
+            </div>
+            <div class="history-content" id="history-content">
+                <!-- History items will be added here -->
+                <div class="empty-history" id="empty-history">
+                    <p>Belum ada catatan tersimpan</p>
+                    <i class="fas fa-book-open"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="paper" id="paper-section">
+                <form id="note-form" onsubmit="saveNote(event)">
+                    <input type="text" id="note-title" name="note-title" placeholder="Judul..." maxlength="50" required>
+                    <textarea id="note-content" name="note-content" placeholder="Tulis catatan ikhlasmu di sini..." required></textarea>
+                    <input type="hidden" id="note-id" name="note-id">
+                    <div class="note-actions">
+                        <button type="submit" id="save-button" class="save-btn">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                    </div>
+                    <div class="note-footer">
+                        <span>sincerePad</span>
+                        <span class="date" id="current-date"></span>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="quote">
+                <p>"Menuangkan catatan dengan ikhlas"</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template for history item (hidden) -->
+    <template id="history-item-template">
+        <div class="history-item" data-id="">
+            <div class="item-header">
+                <h4 class="item-title"></h4>
+                <div class="item-actions">
+                    <button class="edit-btn" onclick="editNote(this.parentNode.parentNode.parentNode.dataset.id)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="delete-btn" onclick="deleteNote(this.parentNode.parentNode.parentNode.dataset.id)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="item-preview"></div>
+            <div class="item-date"></div>
+        </div>
+    </template>
+
+    <!-- Minimal JavaScript inline untuk menyimpan data -->
+    <script>
+        // Format tanggal dan waktu dalam Bahasa Indonesia
+        function formatDateTime(date) {
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            const day = days[date.getDay()];
+            const dateNum = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            const hour = String(date.getHours()).padStart(2, '0');
+            const minute = String(date.getMinutes()).padStart(2, '0');
+            
+            return `${day}, ${dateNum} ${month} ${year} • ${hour}:${minute}`;
+        }
+
+        // Update tanggal saat ini
+        function updateCurrentDate() {
+            const now = new Date();
+            document.getElementById('current-date').textContent = formatDateTime(now);
+        }
+        
+        // Fungsi untuk menyimpan catatan
+        function saveNote(event) {
+            event.preventDefault();
+            
+            const titleInput = document.getElementById('note-title');
+            const contentInput = document.getElementById('note-content');
+            const idInput = document.getElementById('note-id');
+            
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            const id = idInput.value || Date.now().toString();
+            
+            if (!title || !content) {
+                alert('Mohon isi judul dan isi catatan');
+                return;
+            }
+            
+            const now = new Date();
+            const note = {
+                id: id,
+                title: title,
+                content: content,
+                timestamp: now.getTime(),
+                formattedDate: formatDateTime(now)
+            };
+            
+            // Simpan catatan ke localStorage
+            let notes = getNotes();
+            
+            // Update atau tambah baru
+            const index = notes.findIndex(n => n.id === note.id);
+            if (index !== -1) {
+                notes[index] = note;
+            } else {
+                notes.push(note);
+            }
+            
+            // Urutkan berdasarkan timestamp (terbaru dulu)
+            notes.sort((a, b) => b.timestamp - a.timestamp);
+            
+            // Simpan ke localStorage
+            localStorage.setItem('sincerePad_notes', JSON.stringify(notes));
+            
+            // Bersihkan form jika baru
+            if (!idInput.value) {
+                titleInput.value = '';
+                contentInput.value = '';
+            }
+            
+            idInput.value = '';
+            
+            // Tampilkan feedback
+            const saveBtn = document.getElementById('save-button');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-check"></i> Tersimpan';
+            
+            setTimeout(() => {
+                saveBtn.innerHTML = originalText;
+            }, 2000);
+            
+            // Refresh tampilan history
+            loadNotes();
+            
+            updateCurrentDate();
+        }
+        
+        // Fungsi untuk mendapatkan notes dari localStorage
+        function getNotes() {
+            const notes = localStorage.getItem('sincerePad_notes');
+            return notes ? JSON.parse(notes) : [];
+        }
+        
+        // Fungsi untuk menampilkan notes
+        function loadNotes() {
+            const notes = getNotes();
+            const historyContent = document.getElementById('history-content');
+            const emptyHistory = document.getElementById('empty-history');
+            
+            // Hapus semua item history yang sudah ada
+            const items = historyContent.querySelectorAll('.history-item');
+            items.forEach(item => item.remove());
+            
+            if (notes.length === 0) {
+                // Tampilkan pesan kosong
+                emptyHistory.style.display = 'flex';
+            } else {
+                // Sembunyikan pesan kosong
+                emptyHistory.style.display = 'none';
+                
+                // Tambahkan notes ke history
+                const template = document.getElementById('history-item-template');
+                
+                notes.forEach(note => {
+                    const clone = template.content.cloneNode(true);
+                    const historyItem = clone.querySelector('.history-item');
+                    
+                    historyItem.dataset.id = note.id;
+                    historyItem.querySelector('.item-title').textContent = note.title;
+                    
+                    // Batasi preview ke ~50 karakter
+                    const preview = note.content.length > 50 
+                        ? note.content.substring(0, 50) + '...' 
+                        : note.content;
+                    historyItem.querySelector('.item-preview').textContent = preview;
+                    
+                    historyItem.querySelector('.item-date').textContent = note.formattedDate;
+                    
+                    // Tambahkan click handler
+                    historyItem.addEventListener('click', function(e) {
+                        if (!e.target.closest('button')) {
+                            editNote(note.id);
+                        }
+                    });
+                    
+                    historyContent.appendChild(historyItem);
+                });
+            }
+        }
+        
+        // Fungsi untuk mengedit catatan
+        function editNote(id) {
+            const notes = getNotes();
+            const note = notes.find(n => n.id === id);
+            
+            if (note) {
+                document.getElementById('note-title').value = note.title;
+                document.getElementById('note-content').value = note.content;
+                document.getElementById('note-id').value = note.id;
+                
+                // Tutup panel history di mobile
+                if (window.innerWidth <= 600) {
+                    document.getElementById('toggle-history').checked = false;
+                }
+                
+                // Scroll ke atas
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        }
+        
+        // Fungsi untuk menghapus catatan
+        function deleteNote(id) {
+            if (confirm('Yakin ingin menghapus catatan ini?')) {
+                let notes = getNotes();
+                notes = notes.filter(note => note.id !== id);
+                
+                localStorage.setItem('sincerePad_notes', JSON.stringify(notes));
+                
+                // Bersihkan form jika catatan yang dihapus sedang diedit
+                const currentId = document.getElementById('note-id').value;
+                if (currentId === id) {
+                    document.getElementById('note-title').value = '';
+                    document.getElementById('note-content').value = '';
+                    document.getElementById('note-id').value = '';
+                }
+                
+                loadNotes();
+            }
+        }
+        
+        // Load notes saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+            loadNotes();
+        });
+    </script>
 </body>
 </html>
