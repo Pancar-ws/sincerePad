@@ -1,399 +1,285 @@
-// document.addEventListener('DOMContentLoaded', function() {
-//     // Elements
-//     const noteTitle = document.getElementById('note-title');
-//     const noteContent = document.getElementById('note-content');
-//     const saveBtn = document.getElementById('save-btn');
-//     const clearBtn = document.getElementById('clear-btn');
-//     const charCount = document.getElementById('char-count');
-//     const lastSaved = document.getElementById('last-saved');
-//     const notesList = document.getElementById('notes-list');
-    
-//     // Load saved notes
-//     loadNotes();
-    
-//     // Event listeners
-//     noteContent.addEventListener('input', updateCharCount);
-//     saveBtn.addEventListener('click', saveNote);
-//     clearBtn.addEventListener('click', clearNote);
-    
-//     // Functions
-//     function updateCharCount() {
-//         const count = noteContent.value.length;
-//         charCount.textContent = `${count} karakter`;
-//     }
-    
-//     function saveNote() {
-//         const title = noteTitle.value.trim() || 'Catatan Tanpa Judul';
-//         const content = noteContent.value.trim();
-        
-//         if (content === '') {
-//             alert('Catatan kosong tidak dapat disimpan');
-//             return;
-//         }
-        
-//         const timestamp = new Date();
-//         const noteId = 'note_' + Date.now();
-        
-//         const note = {
-//             id: noteId,
-//             title: title,
-//             content: content,
-//             timestamp: timestamp.toISOString()
-//         };
-        
-//         // Get existing notes or initialize empty array
-//         let notes = JSON.parse(localStorage.getItem('sincerePadNotes')) || [];
-        
-//         // Add new note to array
-//         notes.unshift(note);
-        
-//         // Save to localStorage
-//         localStorage.setItem('sincerePadNotes', JSON.stringify(notes));
-        
-//         // Update last saved time
-//         const formattedTime = formatTime(timestamp);
-//         lastSaved.textContent = `Disimpan: ${formattedTime}`;
-        
-//         // Refresh notes list
-//         loadNotes();
-//     }
-    
-//     function loadNotes() {
-//         // Clear current list
-//         notesList.innerHTML = '';
-        
-//         // Get notes from localStorage
-//         const notes = JSON.parse(localStorage.getItem('sincerePadNotes')) || [];
-        
-//         if (notes.length === 0) {
-//             notesList.innerHTML = '<p class="empty-note">Belum ada catatan tersimpan</p>';
-//             return;
-//         }
-        
-//         // Create note elements
-//         notes.forEach(note => {
-//             const noteCard = document.createElement('div');
-//             noteCard.className = 'note-card';
-//             noteCard.dataset.id = note.id;
-            
-//             const date = new Date(note.timestamp);
-//             const formattedTime = formatTime(date);
-            
-//             // Preview content (first 50 characters)
-//             const contentPreview = note.content.length > 50 
-//                 ? note.content.substring(0, 50) + '...' 
-//                 : note.content;
-            
-//             noteCard.innerHTML = `
-//                 <h4>${note.title}</h4>
-//                 <p>${contentPreview}</p>
-//                 <span class="note-time">${formattedTime}</span>
-//             `;
-            
-//             // Add click event to load note
-//             noteCard.addEventListener('click', () => loadNoteToEditor(note));
-            
-//             notesList.appendChild(noteCard);
-//         });
-//     }
-    
-//     function loadNoteToEditor(note) {
-//         noteTitle.value = note.title;
-//         noteContent.value = note.content;
-//         updateCharCount();
-        
-//         // Smooth scroll to editor
-//         document.querySelector('.paper').scrollIntoView({ 
-//             behavior: 'smooth' 
-//         });
-//     }
-    
-//     function clearNote() {
-//         noteTitle.value = '';
-//         noteContent.value = '';
-//         updateCharCount();
-//         lastSaved.textContent = 'Belum disimpan';
-//     }
-    
-//     function formatTime(date) {
-//         const day = date.getDate().toString().padStart(2, '0');
-//         const month = (date.getMonth() + 1).toString().padStart(2, '0');
-//         const year = date.getFullYear();
-//         const hours = date.getHours().toString().padStart(2, '0');
-//         const minutes = date.getMinutes().toString().padStart(2, '0');
-        
-//         return `${day}/${month}/${year} ${hours}:${minutes}`;
-//     }
-    
-//     // Initialize
-//     updateCharCount();
-// });
+// API URL - Ubah sesuai dengan host server
+const API_URL = 'http://localhost:3000/api';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Elements
+    const noteForm = document.getElementById('note-form');
     const noteTitle = document.getElementById('note-title');
     const noteContent = document.getElementById('note-content');
-    const saveBtn = document.getElementById('save-note');
+    const noteId = document.getElementById('note-id');
+    const saveButton = document.getElementById('save-button');
     const currentDateElement = document.getElementById('current-date');
-    const toggleHistoryBtn = document.getElementById('toggle-history');
-    const closeHistoryBtn = document.getElementById('close-history');
-    const historyPanel = document.getElementById('history-panel');
     const historyContent = document.getElementById('history-content');
-    const mainContent = document.querySelector('.main-content');
+    const loadingState = document.getElementById('loading-state');
+    const errorState = document.getElementById('error-state');
+    const emptyHistory = document.getElementById('empty-history');
+    const statusToast = document.getElementById('status-toast');
+    const toastMessage = document.getElementById('toast-message');
     
-    // Current note ID
-    let currentNoteId = null;
-    
-    // Initialize date display
-    updateDateDisplay();
-    
-    // Load notes from localStorage
+    // Initialize
+    updateCurrentDate();
     loadNotes();
     
+    // Auto-reload notes every 30 seconds to keep synchronized with other users
+    setInterval(loadNotes, 30000);
+    
     // Event listeners
-    saveBtn.addEventListener('click', saveNote);
-    toggleHistoryBtn.addEventListener('click', toggleHistory);
-    closeHistoryBtn.addEventListener('click', closeHistory);
+    noteForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        saveNote();
+    });
     
-    // Function to toggle history panel
-    function toggleHistory() {
-        historyPanel.classList.toggle('active');
-        if (historyPanel.classList.contains('active')) {
-            mainContent.style.marginLeft = '280px';
-        } else {
-            mainContent.style.marginLeft = '0';
-        }
-    }
-    
-    // Function to close history panel
-    function closeHistory() {
-        historyPanel.classList.remove('active');
-        mainContent.style.marginLeft = '0';
-    }
-    
-    // Function to format date and time
+    // Format tanggal dan waktu dalam Bahasa Indonesia
     function formatDateTime(date) {
-        const options = { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        };
-        return date.toLocaleDateString('id-ID', options);
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        
+        const day = days[date.getDay()];
+        const dateNum = date.getDate();
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+        const hour = String(date.getHours()).padStart(2, '0');
+        const minute = String(date.getMinutes()).padStart(2, '0');
+        
+        return `${day}, ${dateNum} ${month} ${year} • ${hour}:${minute}`;
     }
     
-    // Function to update current date display
-    function updateDateDisplay() {
+    // Update tanggal saat ini
+    function updateCurrentDate() {
         const now = new Date();
         currentDateElement.textContent = formatDateTime(now);
     }
     
-    // Function to generate unique ID
-    function generateId() {
-        return Date.now().toString();
+    // Fungsi untuk menampilkan toast notification
+    function showToast(message, isError = false) {
+        toastMessage.textContent = message;
+        
+        if (isError) {
+            statusToast.style.backgroundColor = '#CF6679';
+        } else {
+            statusToast.style.backgroundColor = '#3C3D37';
+        }
+        
+        statusToast.classList.remove('hide');
+        statusToast.classList.add('show');
+        
+        // Sembunyikan toast setelah 3 detik
+        setTimeout(() => {
+            statusToast.classList.remove('show');
+            statusToast.classList.add('hide');
+        }, 3000);
     }
     
-    // Function to save note
-    function saveNote() {
+    // Fungsi untuk menyimpan catatan
+    async function saveNote() {
         const title = noteTitle.value.trim();
         const content = noteContent.value.trim();
+        const id = noteId.value;
         
         if (!title || !content) {
-            alert('Mohon isi judul dan isi catatan');
+            showToast('Mohon isi judul dan isi catatan', true);
             return;
         }
         
-        const now = new Date();
-        const formattedDate = formatDateTime(now);
+        // Save button loading state
+        const originalButtonText = saveButton.innerHTML;
+        saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        saveButton.disabled = true;
         
-        const note = {
-            id: currentNoteId || generateId(),
-            title: title,
-            content: content,
-            timestamp: now.getTime(),
-            formattedDate: formattedDate
-        };
-        
-        // Save to localStorage
-        saveNoteToStorage(note);
-        
-        // Update UI
-        updateDateDisplay();
-        
-        // Reset form if creating new note
-        if (!currentNoteId) {
-            noteTitle.value = '';
-            noteContent.value = '';
-            currentNoteId = null;
+        try {
+            const now = new Date();
+            const note = {
+                title: title,
+                content: content,
+                timestamp: now.getTime(),
+                formattedDate: formatDateTime(now)
+            };
+            
+            // Jika ada ID, berarti edit note yang sudah ada
+            let endpoint = `${API_URL}/notes`;
+            let method = 'POST';
+            
+            if (id) {
+                note.id = id;
+                endpoint = `${API_URL}/notes/${id}`;
+                method = 'PUT';
+            }
+            
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(note)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Gagal menyimpan catatan');
+            }
+            
+            // Reset form untuk catatan baru
+            resetForm();
+            
+            // Reload notes untuk memperbarui history
+            loadNotes();
+            
+            showToast('Catatan berhasil disimpan');
+        } catch (error) {
+            console.error('Error saving note:', error);
+            showToast('Gagal menyimpan catatan: ' + error.message, true);
+        } finally {
+            // Restore save button state
+            saveButton.innerHTML = originalButtonText;
+            saveButton.disabled = false;
         }
-        
-        // Show feedback
-        const originalText = saveBtn.innerHTML;
-        saveBtn.innerHTML = '<i class="fas fa-check"></i> Tersimpan';
-        
-        setTimeout(() => {
-            saveBtn.innerHTML = originalText;
-        }, 2000);
-        
-        // Refresh notes list
-        loadNotes();
     }
     
-    // Function to save note to localStorage
-    function saveNoteToStorage(note) {
-        let notes = getNotes();
+    // Fungsi untuk memuat catatan dari server
+    async function loadNotes() {
+        // Tampilkan loading state
+        loadingState.style.display = 'flex';
+        errorState.style.display = 'none';
+        emptyHistory.style.display = 'none';
         
-        // Update existing or add new
-        const index = notes.findIndex(n => n.id === note.id);
-        if (index !== -1) {
-            notes[index] = note;
-        } else {
-            notes.push(note);
+        // Hapus semua catatan sebelumnya
+        const historyItems = historyContent.querySelectorAll('.history-item');
+        historyItems.forEach(item => item.remove());
+        
+        try {
+            const response = await fetch(`${API_URL}/notes`, {
+                cache: 'no-store' // Memastikan browser tidak menyimpan cache
+            });
+            
+            if (!response.ok) {
+                throw new Error('Gagal memuat catatan');
+            }
+            
+            const notes = await response.json();
+            
+            // Sembunyikan loading state
+            loadingState.style.display = 'none';
+            
+            if (notes.length === 0) {
+                emptyHistory.style.display = 'flex';
+                return;
+            }
+            
+            // Render catatan
+            renderNotes(notes);
+            
+            // Log untuk debugging
+            console.log(`Memuat ${notes.length} catatan dari server`);
+        } catch (error) {
+            console.error('Error loading notes:', error);
+            loadingState.style.display = 'none';
+            errorState.style.display = 'flex';
         }
+    }
+    
+    // Fungsi untuk render notes ke history panel
+    function renderNotes(notes) {
+        const template = document.getElementById('history-item-template');
         
-        // Sort by timestamp (newest first)
+        // Sort notes dari yang terbaru
         notes.sort((a, b) => b.timestamp - a.timestamp);
         
-        // Save to localStorage
-        localStorage.setItem('sincerePad_notes', JSON.stringify(notes));
-    }
-    
-    // Function to get notes from localStorage
-    function getNotes() {
-        const notes = localStorage.getItem('sincerePad_notes');
-        return notes ? JSON.parse(notes) : [];
-    }
-    
-    // Function to create history item
-    function createHistoryItem(note) {
-        const template = document.getElementById('history-item-template');
-        const clone = template.content.cloneNode(true);
-        
-        const historyItem = clone.querySelector('.history-item');
-        historyItem.dataset.id = note.id;
-        
-        const titleElement = clone.querySelector('.item-title');
-        titleElement.textContent = note.title;
-        
-        const previewElement = clone.querySelector('.item-preview');
-        // Limit content preview to around 50 characters
-        previewElement.textContent = note.content.length > 50 
-            ? note.content.substring(0, 50) + '...' 
-            : note.content;
-        
-        const dateElement = clone.querySelector('.item-date');
-        dateElement.textContent = note.formattedDate;
-        
-        // Edit button
-        const editBtn = clone.querySelector('.edit-btn');
-        editBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            editNote(note.id);
-        });
-        
-        // Delete button
-        const deleteBtn = clone.querySelector('.delete-btn');
-        deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            deleteNote(note.id);
-        });
-        
-        // Click on item to edit
-        historyItem.addEventListener('click', () => {
-            editNote(note.id);
-        });
-        
-        return clone;
-    }
-    
-    // Function to load notes from localStorage
-    function loadNotes() {
-        const notes = getNotes();
-        
-        // Clear history content
-        while (historyContent.firstChild) {
-            historyContent.removeChild(historyContent.firstChild);
-        }
-        
-        if (notes.length === 0) {
-            // Show empty state
-            const emptyHistory = document.createElement('div');
-            emptyHistory.className = 'empty-history';
+        notes.forEach(note => {
+            // Clone template untuk setiap note
+            const item = document.importNode(template.content, true);
+            const historyItem = item.querySelector('.history-item');
             
-            const emptyText = document.createElement('p');
-            emptyText.textContent = 'Belum ada catatan tersimpan';
+            // Set attribute data-id
+            historyItem.dataset.id = note.id;
             
-            const emptyIcon = document.createElement('i');
-            emptyIcon.className = 'fas fa-book-open';
+            // Set judul
+            const itemTitle = historyItem.querySelector('.item-title');
+            itemTitle.textContent = note.title;
             
-            emptyHistory.appendChild(emptyText);
-            emptyHistory.appendChild(emptyIcon);
+            // Set preview isi catatan (maksimal 100 karakter)
+            const itemPreview = historyItem.querySelector('.item-preview');
+            itemPreview.textContent = note.content.length > 100 
+                ? note.content.substring(0, 100) + '...' 
+                : note.content;
             
-            historyContent.appendChild(emptyHistory);
-        } else {
-            // Add notes to history
-            notes.forEach(note => {
-                const historyItem = createHistoryItem(note);
-                historyContent.appendChild(historyItem);
+            // Set tanggal
+            const itemDate = historyItem.querySelector('.item-date');
+            itemDate.textContent = note.formattedDate || formatDateTime(new Date(note.timestamp));
+            
+            // Event untuk tombol edit
+            const editBtn = historyItem.querySelector('.edit-btn');
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Hindari trigger event parent
+                editNote(note);
             });
+            
+            // Event untuk tombol delete
+            const deleteBtn = historyItem.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Hindari trigger event parent
+                deleteNote(note.id);
+            });
+            
+            // Event ketika klik di area historyItem (selain tombol)
+            historyItem.addEventListener('click', () => {
+                editNote(note);
+            });
+            
+            // Tambahkan ke history content
+            historyContent.appendChild(item);
+        });
+    }
+    
+    // Fungsi untuk edit note
+    function editNote(note) {
+        // Set nilai form
+        noteId.value = note.id;
+        noteTitle.value = note.title;
+        noteContent.value = note.content;
+        
+        // Scroll ke form editor dan fokus ke title
+        document.getElementById('paper-section').scrollIntoView({ behavior: 'smooth' });
+        noteTitle.focus();
+        
+        // Tutup panel history jika layar kecil
+        if (window.innerWidth <= 600) {
+            document.getElementById('toggle-history').checked = false;
         }
     }
     
-    // Function to edit note
-    function editNote(id) {
-        const notes = getNotes();
-        const note = notes.find(n => n.id === id);
+    // Fungsi untuk hapus note
+    async function deleteNote(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus catatan ini?')) {
+            return;
+        }
         
-        if (note) {
-            noteTitle.value = note.title;
-            noteContent.value = note.content;
-            currentNoteId = note.id;
+        try {
+            const response = await fetch(`${API_URL}/notes/${id}`, {
+                method: 'DELETE'
+            });
             
-            // Close history panel on mobile
-            if (window.innerWidth <= 600) {
-                closeHistory();
+            if (!response.ok) {
+                throw new Error('Gagal menghapus catatan');
             }
             
-            // Focus on title
-            noteTitle.focus();
-            
-            // Scroll to top
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-    }
-    
-    // Function to delete note
-    function deleteNote(id) {
-        if (confirm('Yakin ingin menghapus catatan ini?')) {
-            let notes = getNotes();
-            notes = notes.filter(n => n.id !== id);
-            
-            // Save to localStorage
-            localStorage.setItem('sincerePad_notes', JSON.stringify(notes));
-            
-            // Clear form if deleting current note
-            if (currentNoteId === id) {
-                noteTitle.value = '';
-                noteContent.value = '';
-                currentNoteId = null;
+            // Reset form jika sedang mengedit note yang dihapus
+            if (noteId.value === id) {
+                resetForm();
             }
             
-            // Refresh notes list
+            // Reload notes untuk memperbarui history
             loadNotes();
+            
+            showToast('Catatan berhasil dihapus');
+        } catch (error) {
+            console.error('Error deleting note:', error);
+            showToast('Gagal menghapus catatan: ' + error.message, true);
         }
     }
     
-    // Handle responsive behavior
-    window.addEventListener('resize', function() {
-        if (window.innerWidth <= 600 && historyPanel.classList.contains('active')) {
-            mainContent.style.marginLeft = '0';
-        } else if (window.innerWidth > 600 && historyPanel.classList.contains('active')) {
-            mainContent.style.marginLeft = '280px';
-        }
-    });
+    // Fungsi untuk reset form
+    function resetForm() {
+        noteForm.reset();
+        noteId.value = '';
+        updateCurrentDate();
+    }
 });
