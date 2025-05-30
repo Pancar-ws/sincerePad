@@ -1,0 +1,4 @@
+# .gitignore
+node_modules/
+.env
+notes.json # Jika Anda masih punya file ini, bisa dihapus atau diabaikan
