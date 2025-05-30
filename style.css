@@ -1,607 +1,151 @@
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes gentle-pulse {
-    0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); }
-    50% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
-    100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); }
-}
-
-@keyframes focus-border {
-    from { border-bottom-color: #3C3D37; }
-    to { border-bottom-color: #646560; }
-}
-
-@keyframes subtle-float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
-    100% { transform: translateY(0px); }
-}
-
-@keyframes pulse-feedback {
-    0% { background-color: #3C3D37; }
-    50% { background-color: #4A6B44; }
-    100% { background-color: #3C3D37; }
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-@keyframes toast-in {
-    from { transform: translateY(100px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes toast-out {
-    from { transform: translateY(0); opacity: 1; }
-    to { transform: translateY(100px); opacity: 0; }
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
 body {
-    background-color: #181C14;
-    font-family: 'Inter', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #f0f2f5; /* Warna latar belakang halaman yang lembut */
+    color: #1c1e21; /* Warna teks utama */
     margin: 0;
-    padding: 0;
-    color: #ffffff;
-    line-height: 1.5;
-    animation: fadeIn 1.5s ease;
-}
-
-header {
-    padding: 15px 20px;
-    background-color: #3C3D37;
-    margin-bottom: 25px;
-    text-align: left;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 1;
+    padding: 20px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-h1 {
-    font-size: 1.5em;
-    font-weight: 400;
-    letter-spacing: 1px;
-    animation: fadeIn 1s ease;
-}
-
-.shared-indicator {
-    background-color: #4A6B44;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.8em;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    justify-content: center;
+    align-items: flex-start; /* Konten mulai dari atas */
+    min-height: 100vh; /* Pastikan body mengisi seluruh tinggi viewport */
+    box-sizing: border-box;
 }
 
 .container {
-    display: flex;
-    position: relative;
+    background-color: #ffffff; /* Kontainer utama berwarna putih */
+    padding: 25px 30px;
+    border-radius: 8px; /* Sudut yang sedikit membulat */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1); /* Efek bayangan halus */
     width: 100%;
+    max-width: 700px; /* Lebar maksimum kontainer */
+    box-sizing: border-box; /* Padding dan border termasuk dalam width/height */
 }
 
-.main-content {
-    flex-grow: 1;
-    transition: margin-left 0.3s ease;
+h1 {
+    color: #1877f2; /* Warna biru khas (mirip Facebook) */
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 28px;
+    font-weight: 600;
 }
 
-/* Toggle button for history panel */
-.toggle-btn {
-    position: fixed;
-    top: 85px;
-    left: -2px;
-    background-color: #3C3D37;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
-    z-index: 10;
-    transition: left 0.3s ease, background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+p {
+    text-align: center;
+    color: #606770; /* Warna teks sekunder yang lebih lembut */
+    margin-bottom: 25px;
+    font-size: 17px;
+    line-height: 1.4;
 }
 
-.toggle-btn:hover {
-    background-color: #4A6B44;
+textarea#noteInput {
+    width: 100%; /* Mengisi lebar kontainer */
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccd0d5; /* Border abu-abu muda */
+    border-radius: 6px;
+    font-size: 16px;
+    line-height: 1.5;
+    box-sizing: border-box;
+    resize: vertical; /* Izinkan pengguna mengubah tinggi textarea secara vertikal */
+    min-height: 80px; /* Tinggi minimal textarea */
 }
 
-.toggle-btn .tooltip {
-    position: absolute;
-    background-color: #3C3D37;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.75em;
-    left: 50px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
+textarea#noteInput:focus {
+    border-color: #1877f2; /* Border biru saat fokus */
+    box-shadow: 0 0 0 2px #e7f3ff; /* Efek glow biru muda saat fokus */
+    outline: none; /* Hilangkan outline default browser */
 }
 
-.toggle-btn:hover .tooltip {
-    opacity: 1;
-}
-
-/* History Toggle Checkbox (hidden) */
-.history-toggle {
-    display: none;
-}
-
-/* When checkbox is checked, adjust toggle button */
-.history-toggle:checked ~ .toggle-btn {
-    left: 278px;
-}
-
-/* History Panel */
-.history-panel {
-    position: fixed;
-    left: 0;
-    top: 74px;
-    width: 280px;
-    height: calc(100% - 74px);
-    background-color: #262822;
-    border-right: 1px solid #3C3D37;
-    z-index: 5;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-/* When checkbox is checked, show the panel */
-.history-toggle:checked ~ .history-panel {
-    transform: translateX(0);
-    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
-}
-
-/* When checkbox is checked, adjust main content margin */
-.history-toggle:checked ~ .main-content {
-    margin-left: 280px;
-}
-
-/* On mobile, don't shift content */
-@media (max-width: 768px) {
-    .history-toggle:checked ~ .main-content {
-        margin-left: 0;
-    }
-    
-    .history-toggle:checked ~ .toggle-btn {
-        left: 278px;
-    }
-    
-    .history-panel {
-        width: 280px;
-    }
-}
-
-.history-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background-color: #3C3D37;
-    border-bottom: 1px solid #4A4B44;
-}
-
-.history-header h3 {
-    font-size: 1em;
-    font-weight: 400;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.close-btn {
-    background: none;
+button#saveNoteButton {
+    background-color: #1877f2; /* Warna tombol biru */
+    color: white; /* Teks tombol putih */
+    padding: 10px 18px;
     border: none;
-    color: #a0a0a0;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 1.2em;
-    padding: 5px;
-    transition: color 0.2s ease;
+    font-size: 17px;
+    font-weight: bold;
+    display: block; /* Agar bisa diatur width 100% */
+    width: 100%; /* Tombol mengisi lebar kontainer */
+    transition: background-color 0.2s ease-in-out; /* Transisi halus saat hover */
 }
 
-.close-btn:hover {
-    color: white;
+button#saveNoteButton:hover {
+    background-color: #166fe5; /* Warna tombol sedikit lebih gelap saat di-hover */
 }
 
-.history-content {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 10px;
-    scrollbar-width: thin;
-    scrollbar-color: #4A4B44 transparent;
+button#saveNoteButton:active {
+    background-color: #1465d1; /* Warna tombol saat ditekan */
 }
 
-.history-content::-webkit-scrollbar {
+h2 {
+    color: #1c1e21; /* Warna judul histori */
+    font-size: 20px;
+    margin-top: 35px; /* Jarak atas dari tombol */
+    margin-bottom: 12px;
+    border-bottom: 1px solid #dddfe2; /* Garis pemisah tipis */
+    padding-bottom: 8px;
+}
+
+ul#notesHistory {
+    list-style-type: none; /* Hilangkan bullet default list */
+    padding: 0;
+    margin-top: 0;
+    max-height: 400px; /* Tinggi maksimum list histori, akan muncul scroll jika lebih */
+    overflow-y: auto; /* Tambahkan scroll vertikal jika konten melebihi max-height */
+    border: 1px solid #e0e0e0; /* Border tipis di sekeliling list */
+    border-radius: 6px; /* Sudut membulat untuk list */
+    background-color: #f9f9f9; /* Latar belakang list sedikit berbeda */
+}
+
+ul#notesHistory li {
+    background-color: #ffffff; /* Latar belakang item list */
+    padding: 12px 15px;
+    margin: 0;
+    border-bottom: 1px solid #e7e7e7; /* Garis pemisah antar item list */
+    font-size: 15px;
+    color: #333333; /* Warna teks item list */
+    word-wrap: break-word; /* Pastikan teks panjang tidak merusak layout */
+    line-height: 1.6;
+}
+
+ul#notesHistory li:first-child {
+    border-top-left-radius: 5px; /* Sudut membulat untuk item pertama di atas */
+    border-top-right-radius: 5px;
+}
+
+
+ul#notesHistory li:last-child {
+    border-bottom: none; /* Hilangkan border bawah untuk item terakhir */
+    border-bottom-left-radius: 5px; /* Sudut membulat untuk item terakhir di bawah */
+    border-bottom-right-radius: 5px;
+}
+
+ul#notesHistory li:empty {
+    display: none; /* Sembunyikan jika ada item list kosong (seharusnya tidak terjadi) */
+}
+
+ul#notesHistory li:hover {
+    background-color: #f5f5f5; /* Efek hover ringan pada item list */
+}
+
+
+/* Styling untuk scrollbar (opsional, untuk browser WebKit seperti Chrome/Safari) */
+ul#notesHistory::-webkit-scrollbar {
     width: 8px;
 }
 
-.history-content::-webkit-scrollbar-track {
-    background: transparent;
+ul#notesHistory::-webkit-scrollbar-track {
+    background: #f0f2f5;
+    border-radius: 10px;
 }
 
-.history-content::-webkit-scrollbar-thumb {
-    background-color: #4A4B44;
-    border-radius: 20px;
+ul#notesHistory::-webkit-scrollbar-thumb {
+    background: #bcc0c4; /* Warna scrollbar thumb */
+    border-radius: 10px;
 }
 
-/* Loading State */
-.loading-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 0;
-    color: #a0a0a0;
-    height: 100%;
-}
-
-.loading-state i {
-    font-size: 2em;
-    margin-bottom: 10px;
-    animation: spin 1s infinite linear;
-}
-
-/* Error State */
-.error-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 0;
-    color: #ff6b6b;
-    height: 100%;
-}
-
-.error-state i {
-    font-size: 2em;
-    margin-bottom: 10px;
-}
-
-.retry-btn {
-    background-color: transparent;
-    border: 1px solid #a0a0a0;
-    color: #a0a0a0;
-    border-radius: 4px;
-    padding: 5px 10px;
-    margin-top: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.retry-btn:hover {
-    border-color: white;
-    color: white;
-}
-
-/* Empty State */
-.empty-history {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 0;
-    color: #a0a0a0;
-    height: 100%;
-}
-
-.empty-history i {
-    font-size: 2em;
-    margin-top: 10px;
-    opacity: 0.6;
-}
-
-/* History Items */
-.history-item {
-    background-color: #2A2C25;
-    border-radius: 4px;
-    padding: 12px;
-    margin-bottom: 12px;
-    border-left: 3px solid #4A6B44;
-    transition: all 0.2s ease;
-    animation: fadeIn 0.5s ease;
-    cursor: pointer;
-    position: relative;
-}
-
-.history-item:hover {
-    background-color: #323329;
-    transform: translateY(-2px);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-}
-
-.item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8px;
-}
-
-.item-title {
-    font-size: 0.95em;
-    font-weight: 500;
-    color: #ffffff;
-    margin-right: 10px;
-    word-break: break-word;
-    line-height: 1.3;
-    flex: 1;
-}
-
-.item-actions {
-    display: flex;
-    gap: 5px;
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
-}
-
-.history-item:hover .item-actions {
-    opacity: 1;
-}
-
-.edit-btn, .delete-btn {
-    background: none;
-    border: none;
-    color: #a0a0a0;
-    cursor: pointer;
-    padding: 3px;
-    font-size: 0.9em;
-    border-radius: 3px;
-    transition: all 0.2s ease;
-}
-
-.edit-btn:hover {
-    color: #90CAF9;
-    background-color: rgba(144, 202, 249, 0.1);
-}
-
-.delete-btn:hover {
-    color: #ff6b6b;
-    background-color: rgba(255, 107, 107, 0.1);
-}
-
-.item-preview {
-    font-size: 0.85em;
-    color: #a0a0a0;
-    margin-bottom: 10px;
-    line-height: 1.4;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    word-break: break-all;
-}
-
-.item-date {
-    font-size: 0.75em;
-    color: #7d7d7d;
-    font-style: italic;
-}
-
-/* Paper (Note Editor) */
-.paper {
-    background-color: #2A2C25;
-    width: 90%;
-    max-width: 600px;
-    margin: 0 auto 20px;
-    padding: 25px;
-    border: 1px solid #4A4B44;
-    border-radius: 6px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 1s ease 0.3s both, gentle-pulse 3s infinite ease-in-out;
-    transition: all 0.3s ease;
-}
-
-.paper:hover {
-    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
-}
-
-#note-title {
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #4A4B44;
-    color: #ffffff;
-    font-size: 1.1em;
-    width: 100%;
-    padding: 5px 0;
-    margin-bottom: 15px;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
-
-#note-title:focus {
-    animation: focus-border 0.5s forwards;
-}
-
-#note-title::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-    transition: color 0.3s ease;
-}
-
-#note-title:focus::placeholder {
-    color: rgba(255, 255, 255, 0.3);
-}
-
-#note-content {
-    width: 100%;
-    height: 220px;
-    background-color: transparent;
-    border: none;
-    color: #ffffff;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.95em;
-    line-height: 1.6;
-    padding: 5px 0;
-    resize: none;
-    outline: none;
-    transition: all 0.3s ease;
-}
-
-#note-content::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-    transition: color 0.3s ease;
-}
-
-#note-content:focus::placeholder {
-    color: rgba(255, 255, 255, 0.3);
-}
-
-.note-actions {
-    margin-top: 15px;
-    text-align: right;
-}
-
-.save-btn {
-    background-color: #4A6B44;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.save-btn:hover {
-    background-color: #587F52;
-}
-
-.save-btn:active {
-    transform: scale(0.98);
-}
-
-.save-btn:disabled {
-    background-color: #3C3D37;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.note-footer {
-    padding: 15px 0 5px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75em;
-    color: #a0a0a0;
-    border-top: 1px solid #4A4B44;
-    margin-top: 10px;
-    font-style: italic;
-}
-
-.date {
-    opacity: 0.7;
-}
-
-.quote {
-    text-align: center;
-    margin: 40px auto;
-    max-width: 80%;
-    color: #a0a0a0;
-    font-style: italic;
-    font-size: 0.9em;
-    opacity: 0.8;
-    animation: subtle-float 6s infinite ease-in-out, fadeIn 2s ease 1s both;
-}
-
-/* Status Toast */
-.status-toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background-color: #3C3D37;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 4px;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    font-size: 0.9em;
-    opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    text-align: center;
-    min-width: 250px;
-}
-
-.status-toast.show {
-    animation: toast-in 0.3s forwards;
-}
-
-.status-toast.hide {
-    animation: toast-out 0.3s forwards;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        flex-direction: column;
-    }
-    
-    .paper {
-        width: 95%;
-        padding: 20px;
-        margin-bottom: 15px;
-    }
-    
-    .history-panel {
-        width: 100%;
-        max-width: 100%;
-        z-index: 100;
-    }
-    
-    .history-toggle:checked ~ .toggle-btn {
-        left: calc(100% - 40px);
-    }
-    
-    .quote {
-        margin: 20px auto;
-    }
-    
-    .note-content {
-        height: 180px;
-    }
-}
-
-@media (max-width: 480px) {
-    header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        padding-bottom: 15px;
-    }
-    
-    .shared-indicator {
-        font-size: 0.75em;
-    }
-    
-    .history-item {
-        padding: 10px;
-    }
-    
-    .paper {
-        padding: 15px;
-    }
-    
-    .save-btn {
-        width: 100%;
-        justify-content: center;
-    }
+ul#notesHistory::-webkit-scrollbar-thumb:hover {
+    background: #a0a4a8; /* Warna scrollbar thumb saat hover */
 }

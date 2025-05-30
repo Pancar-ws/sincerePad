@@ -1,147 +1,25 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>Note</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <header>
-        <h1>sincerePad.</h1>
-    </header>
-    <h2>Note</h2>
-    <p>Note is a simple note-taking application that allows you to create, edit, and delete notes. It is designed to be easy to use and lightweight.</p>
-</body>
-</html> -->
-
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>sincerePad.</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-</head>
-<body>
-    <header>
-        <h1>sincerePad.</h1>
-    </header>
-
-    <div class="paper">
-        <input type="text" id="note-title" placeholder="Judul..." maxlength="50">
-        <textarea id="note-content" placeholder="Tulis catatan ikhlasmu di sini..."></textarea>
-        <div class="note-footer">
-            <span>sincerePad</span>
-            <span class="date" id="current-date"></span>
-        </div>
-    </div>
-    
-    <div class="quote">
-        <p>"Menuangkan catatan dengan ikhlas"</p>
-    </div>
-</body>
-</html> -->
-
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>sincerePad.</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SincerePad - Pencatat Kalimat</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <!-- Font Awesome untuk ikon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <header>
-        <h1>sincerePad.</h1>
-        <span class="shared-indicator"><i class="fas fa-users"></i> Shared Notes</span>
-    </header>
-
     <div class="container">
-        <!-- History panel menggunakan checkbox untuk toggle -->
-        <input type="checkbox" id="toggle-history" class="history-toggle">
-        <label for="toggle-history" class="toggle-btn">
-            <i class="fas fa-history"></i>
-            <span class="tooltip">Riwayat Catatan</span>
-        </label>
+        <h1>SincerePad</h1>
+        <p>Tuliskan kalimat apapun yang ingin Anda simpan.</p>
 
-        <!-- Panel history -->
-        <div class="history-panel">
-            <div class="history-header">
-                <h3><i class="fas fa-users"></i> Riwayat Catatan Bersama</h3>
-                <label for="toggle-history" class="close-btn"><i class="fas fa-times"></i></label>
-            </div>
-            <div class="history-content" id="history-content">
-                <!-- Loading state -->
-                <div class="loading-state" id="loading-state">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Memuat catatan...</p>
-                </div>
-                <!-- Error state -->
-                <div class="error-state" id="error-state" style="display: none;">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <p>Gagal memuat catatan</p>
-                    <button class="retry-btn" onclick="loadNotes()">Coba Lagi</button>
-                </div>
-                <!-- Empty state -->
-                <div class="empty-history" id="empty-history" style="display: none;">
-                    <p>Belum ada catatan tersimpan</p>
-                    <i class="fas fa-book-open"></i>
-                </div>
-            </div>
-        </div>
+        <textarea id="noteInput" placeholder="Ketik kalimat Anda di sini..." rows="4"></textarea>
+        <button id="saveNoteButton">Simpan Kalimat</button>
 
-        <div class="main-content">
-            <div class="paper" id="paper-section">
-                <form id="note-form">
-                    <input type="text" id="note-title" name="note-title" placeholder="Judul..." maxlength="50" required>
-                    <textarea id="note-content" name="note-content" placeholder="Tulis catatan ikhlasmu di sini... Catatan ini akan terlihat oleh semua pengguna." required></textarea>
-                    <input type="hidden" id="note-id" name="note-id">
-                    <div class="note-actions">
-                        <button type="submit" id="save-button" class="save-btn">
-                            <i class="fas fa-save"></i> Simpan
-                        </button>
-                    </div>
-                    <div class="note-footer">
-                        <span>sincerePad</span>
-                        <span class="date" id="current-date"></span>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="quote">
-                <p>"Menuangkan catatan dengan ikhlas dan berbagi dengan sesama"</p>
-            </div>
-        </div>
+        <h2>Histori Kalimat:</h2>
+        <ul id="notesHistory">
+            <li>Memuat histori...</li>
+        </ul>
     </div>
 
-    <!-- Template for history item (hidden) -->
-    <template id="history-item-template">
-        <div class="history-item" data-id="">
-            <div class="item-header">
-                <h4 class="item-title"></h4>
-                <div class="item-actions">
-                    <button class="edit-btn">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="delete-btn">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="item-preview"></div>
-            <div class="item-date"></div>
-        </div>
-    </template>
-
-    <!-- Status toast untuk notifikasi -->
-    <div class="status-toast" id="status-toast">
-        <span id="toast-message"></span>
-    </div>
-
-    <!-- Script untuk manajemen notes -->
     <script src="main.js"></script>
 </body>
 </html>
